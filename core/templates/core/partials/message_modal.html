@@ -1,0 +1,25 @@
+<div class="p-5">
+  <div class="flex items-start justify-between">
+    <h2 class="text-lg font-semibold">{{ m.subject }}</h2>
+    <button onclick="document.getElementById('modal').classList.add('hidden')" class="text-slate-500">✕</button>
+  </div>
+
+  <div class="mt-2 text-sm text-slate-600">
+    <div><span class="font-medium">From:</span> {{ m.sender }}</div>
+    <div><span class="font-medium">Employee:</span> {{ m.employee.display_name }}</div>
+    <div><span class="font-medium">Client:</span> {{ m.client.name if m.client else 'Unassigned' }}</div>
+    <div><span class="font-medium">Received:</span> {{ m.received_at|date:'M d, Y H:i' }}</div>
+  </div>
+
+  <div class="mt-4 text-slate-800">{{ m.snippet }}</div>
+
+  <div class="mt-4 flex gap-2">
+    {% for t in m.tags %}
+      <span class="text-xs bg-slate-100 px-2 py-1 rounded-full">{{ t }}</span>
+    {% endfor %}
+  </div>
+
+  <div class="mt-5 text-right">
+    <button onclick="document.getElementById('modal').classList.add('hidden')" class="px-3 py-1 rounded bg-slate-900 text-white">Close</button>
+  </div>
+</div>
