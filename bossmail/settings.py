@@ -7,11 +7,12 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret")
-DEBUG = True
+DEBUG = False
 ALLOWED_HOSTS = ["*"]
 
 
 INSTALLED_APPS = [
+
 "django.contrib.admin",
 "django.contrib.auth",
 "django.contrib.contenttypes",
@@ -24,6 +25,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
 "django.middleware.security.SecurityMiddleware",
+"whitenoise.middleware.WhiteNoiseMiddleware",
 "django.contrib.sessions.middleware.SessionMiddleware",
 "django.middleware.common.CommonMiddleware",
 "django.middleware.csrf.CsrfViewMiddleware",
@@ -59,10 +61,10 @@ DATABASES = {
 }
 
 
-
 STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"      # <-- where collectstatic will put files
-STATICFILES_DIRS = [BASE_DIR / "core" / "static"]  # your app’s local static (optional)
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
 
 
 # Celery (configure broker in prod)
