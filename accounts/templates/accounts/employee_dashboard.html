@@ -1,0 +1,19 @@
+{% extends "core/base.html" %}
+{% block content %}
+<h1 class="text-2xl font-semibold mb-2">Welcome, {{ employee.display_name }}</h1>
+
+{% if not employee.approved %}
+  <div class="bg-yellow-50 border border-yellow-200 text-yellow-800 rounded p-4 mb-6">
+    Your account is pending admin approval. You can still set up your clients meanwhile.
+  </div>
+{% endif %}
+
+<div class="bg-white rounded-2xl shadow p-6">
+  <h2 class="text-lg font-semibold mb-2">Next steps</h2>
+  <ol class="list-decimal pl-5 text-sm text-slate-700 space-y-1">
+    <li>Admin will approve your access.</li>
+    <li>Add your clients (from the Clients page).</li>
+    <li>We’ll start syncing your mailbox once Google access is connected.</li>
+  </ol>
+</div>
+{% endblock %}

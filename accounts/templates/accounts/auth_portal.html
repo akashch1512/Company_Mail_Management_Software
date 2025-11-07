@@ -1,0 +1,24 @@
+{% extends "core/base.html" %}
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+  <h1 class="text-2xl font-semibold">Employee Sign-In</h1>
+  <a href="{% url 'admin_login' %}" class="text-sm text-slate-600 underline">Admin Login</a>
+</div>
+
+<div class="bg-white rounded-2xl shadow p-6 max-w-lg">
+  <p class="text-sm text-slate-600 mb-4">
+    Enter your company code, then continue with Google to connect your mailbox.
+  </p>
+
+  <form method="post" action="{% url 'auth_portal' %}">
+    {% csrf_token %}
+    <label class="block text-sm mb-2">Company Code</label>
+    <input name="code" value="{{ form.code.value|default:'' }}" placeholder="e.g. 9K2Q-7TMD"
+           class="border rounded w-full p-2 mb-4" required />
+
+    <button class="w-full bg-slate-900 text-white rounded px-4 py-2">
+      Continue with Google
+    </button>
+  </form>
+</div>
+{% endblock %}

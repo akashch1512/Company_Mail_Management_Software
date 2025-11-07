@@ -1,11 +1,32 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
+import secrets
+import string
 
+def generate_onboarding_code(length=10):
+    alphabet = string.ascii_uppercase + string.digits
+    return "".join(secrets.choice(alphabet) for _ in range(length))
+
+class Org(models.Model):
+    name = models.CharField(max_length=120)
+    special_code = models.CharField(max_length=32, unique=True, db_index=True, default=generate_onboarding_code)
+    code_updated_at = models.DateTimeField(auto_now=True)
+
+    def rotate_code(self):
+        self.special_code = generate_onboarding_code()
+        self.save(update_fields=["special_code", "code_updated_at"])
+
+    def __str__(self):
+        return self.name
 
 class Employee(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="employee")
+    org = models.ForeignKey(Org, on_delete=models.CASCADE, related_name="employees", null=True, blank=True)
     display_name = models.CharField(max_length=120)
     primary_email = models.EmailField(blank=True)
+    approved = models.BooleanField(default=False)  # admin approves after join
+
     def __str__(self):
         return self.display_name
 
@@ -14,8 +35,7 @@ class Client(models.Model):
     name = models.CharField(max_length=120)
     note = models.TextField(blank=True)
     def __str__(self):
-        return f"{self.code} – {self.name}"
-
+        return f"{self.code} - {self.name}"
 
 class EmployeeClient(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)

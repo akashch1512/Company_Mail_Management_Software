@@ -1,0 +1,82 @@
+{% extends "core/base.html" %}
+{% block content %}
+<!-- Onboarding Code Card -->
+<div class="bg-white rounded-2xl shadow p-6 mb-8">
+  <div class="flex items-center justify-between mb-2">
+    <h2 class="text-lg font-semibold">Employee Onboarding</h2>
+  </div>
+  <p class="text-sm text-slate-600 mb-4">Share this code with employees to join your company via /auth.</p>
+
+  <div class="flex items-center gap-3">
+    <!-- Masked code shown by default -->
+    <div id="code-box" class="font-mono bg-slate-100 rounded px-3 py-2">
+      {{ masked_code }}
+    </div>
+
+    <!-- Reveal actual code (HTMX swaps in partial) -->
+    {% csrf_token %}
+    <button
+      class="px-3 py-2 rounded border"
+      hx-post="{% url 'admin_code_reveal' %}"
+      hx-target="#code-box"
+      hx-swap="innerHTML"
+      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+    >
+      Reveal
+    </button>
+
+    <!-- Copy button -->
+    <button class="px-3 py-2 rounded border" onclick="copyCode()">Copy</button>
+
+    <!-- Regenerate -->
+    <form method="post" action="{% url 'admin_code_regen' %}" onsubmit="return confirm('Regenerate the code? Old code will stop working.');">
+      {% csrf_token %}
+      <button class="px-3 py-2 rounded bg-red-600 text-white">Regenerate</button>
+    </form>
+  </div>
+  <script>
+    function copyCode() {
+      const el = document.getElementById('code-box');
+      const text = el.innerText.trim();
+      navigator.clipboard.writeText(text);
+    }
+  </script>
+</div>
+
+<!-- Employees Table -->
+<div class="bg-white rounded-2xl shadow">
+  <div class="px-4 py-3 border-b">
+    <h2 class="text-lg font-semibold">Employees</h2>
+  </div>
+  <div class="grid grid-cols-6 gap-4 px-4 py-2 text-xs font-semibold text-slate-500">
+    <div>Name</div><div>Email</div><div>Org</div><div>Approved</div><div>Username</div><div>Action</div>
+  </div>
+  {% for e in employees %}
+    <div class="grid grid-cols-6 gap-4 px-4 py-3 items-center border-t">
+      <div>{{ e.display_name }}</div>
+      <div>{{ e.primary_email }}</div>
+      <div>{% if e.org %}{{ e.org.name }}{% endif %}</div>
+      <div>
+        {% if e.approved %}
+          <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">Yes</span>
+        {% else %}
+          <span class="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded-full">No</span>
+        {% endif %}
+      </div>
+      <div class="text-slate-500 text-sm">{{ e.user.username }}</div>
+      <div>
+        {% if not e.approved %}
+          <form method="post" action="{% url 'admin_employee_approve' e.id %}">
+            {% csrf_token %}
+            <button class="text-sm px-3 py-1 rounded bg-slate-900 text-white">Approve</button>
+          </form>
+        {% else %}
+          <span class="text-xs text-slate-500">—</span>
+        {% endif %}
+      </div>
+    </div>
+  {% empty %}
+    <div class="p-6 text-center text-slate-500">No employees yet.</div>
+  {% endfor %}
+</div>
+{% endblock %}

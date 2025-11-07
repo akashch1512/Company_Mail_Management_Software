@@ -6,8 +6,8 @@ load_dotenv()
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret")
-DEBUG = False
+SECRET_KEY = os.environ.get("SECRET_KEY")
+DEBUG = True
 ALLOWED_HOSTS = ["*"]
 
 
@@ -20,6 +20,7 @@ INSTALLED_APPS = [
 "django.contrib.messages",
 "django.contrib.staticfiles",
 "core",
+"accounts",
 ]
 
 
@@ -70,4 +71,7 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 # Celery (configure broker in prod)
 CELERY_BROKER_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
 CELERY_RESULT_BACKEND = CELERY_BROKER_URL
+
+# bossmail/settings.py
+LOGIN_URL = "/accounts/auth/"
 LOGIN_REDIRECT_URL = "/"

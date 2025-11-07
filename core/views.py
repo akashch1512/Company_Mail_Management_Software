@@ -4,6 +4,12 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.http import HttpResponse
 from django.utils import timezone
 from datetime import timedelta
+from django.views.decorators.http import require_http_methods
+from accounts.decorators import admin_required, employee_required
+
+from .models import Org, Employee
+from django.contrib import messages
+
 
 from .models import Message, SenderMapping, Employee, Client
 from .rules import detect_assignment
@@ -122,3 +128,76 @@ def seed_demo_view(request):
             },
         )
     return redirect("dashboard")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@admin_required
+def admin_dashboard(request):
+    """
+    /admin/dashboard - shows onboarding code (masked), employees list with approve toggle.
+    """
+    # For simplicity, assume a single Org owned by the first admin.
+    # In multi-org setups, tie Org to request.user.
+    org = Org.objects.order_by("id").first()
+    employees = Employee.objects.select_related("user", "org").order_by("display_name", "user__username")
+
+    masked = "•" * (len(org.special_code) - 4) + org.special_code[-4:] if org and org.special_code else ""
+    return render(request, "core/onboarding.html", {
+        "org": org,
+        "employees": employees,
+        "masked_code": masked,
+    })
+
+@admin_required
+@require_http_methods(["POST"])
+def admin_code_reveal(request):
+    
+    org = Org.objects.order_by("id").first()
+    return render(request, "core/partials/admin_code_value.html", {"value": org.special_code})
+
+@admin_required
+@require_http_methods(["POST"])
+def admin_code_regen(request):
+    org = Org.objects.order_by("id").first()
+    org.rotate_code()
+    messages.success(request, "Admin code regenerated. Share the new code with employees.")
+    return redirect("dashboard")
+
+@admin_required
+@require_http_methods(["POST"])
+def admin_employee_approve(request, employee_id: int):
+    emp = get_object_or_404(Employee, id=employee_id)
+    emp.approved = True
+    emp.save(update_fields=["approved"])
+    messages.success(request, f"{emp.display_name} approved.")
+    return redirect("dashboard")
+
+
+
+
+
+
