@@ -1,55 +1,68 @@
 <!doctype html>
 <html lang="en">
-
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>BossMail</title>
-  <!-- Tailwind CDN (dev only) -->
+  <!-- Tailwind (dev) -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- HTMX -->
   <script src="https://unpkg.com/htmx.org@2.0.3"></script>
 </head>
 
 <body class="bg-slate-50 text-slate-900">
-  <nav class="bg-white border-b p-4 flex justify-between sticky top-0 z-10">
-    <div class="font-semibold">BossMail</div>
-    <div class="space-x-4 text-sm">
-      <a href="/" class="hover:underline">Dashboard</a>
-      <a href="{% url 'mappings' %}" class="hover:underline">Mappings</a>
-      <a href="{% url 'clients' %}" class="hover:underline">Clients</a>
-      <a href="/admin" class="hover:underline">Database Access</a>
-      <a href="{% url 'employee_onboarding' %}" class="hover:underline">Employee Onboarding</a>
-      {% if user.is_authenticated %}
+  <!-- Header -->
+  <nav class="bg-white border-b sticky top-0 z-10">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="h-14 flex items-center justify-between">
+        <!-- Brand -->
+        <a href="/" class="text-lg font-semibold tracking-tight">BossMail</a>
 
-      <a href="{% url 'admin_logout' %}" class="hover:underline text-red-800">Logout</a>
-      {% endif %}
+        <!-- Nav links -->
+        <div class="hidden sm:flex items-center gap-4 text-sm">
+          <a href="/" class="hover:underline">Dashboard</a>
+          <a href="{% url 'mappings' %}" class="hover:underline">Mappings</a>
+          <a href="{% url 'clients' %}" class="hover:underline">Clients</a>
+          <a href="{% url 'employee_onboarding' %}" class="hover:underline">Employee Onboarding</a>
 
+          {% if user.is_authenticated and user.is_staff or user.is_authenticated and user.is_superuser %}
+            <a href="/admin" class="hover:underline">Database</a>
+          {% endif %}
+
+          {% if user.is_authenticated %}
+            <form method="post" action="{% url 'admin_logout' %}">
+              {% csrf_token %}
+              <button class="text-red-700 hover:underline">Logout</button>
+            </form>
+          {% else %}
+            <a href="{% url 'admin_login' %}" class="hover:underline">Admin Login</a>
+          {% endif %}
+        </div>
+      </div>
     </div>
   </nav>
 
-  <main class=" p-6 max-w-6xl mx-auto">
-        {% block content %}{% endblock %}
-        </main>
+  <!-- Page content -->
+  <main class="p-6 max-w-6xl mx-auto">
+    {% block content %}{% endblock %}
+  </main>
 
-        <!-- Modal target -->
-        <div id="modal" class="fixed inset-0 hidden items-center justify-center bg-black/40">
-          <div id="modal-body" class="bg-white rounded-2xl shadow-xl w-full max-w-2xl"></div>
-        </div>
-        <script>
-          document.body.addEventListener('htmx:afterSwap', (e) => {
-            if (e.detail.target.id === 'modal-body') {
-              document.getElementById('modal').classList.remove('hidden');
-              document.getElementById('modal').classList.add('flex');
-            }
-          });
-          document.addEventListener('click', (e) => {
-            if (e.target.id === 'modal') {
-              e.target.classList.add('hidden');
-              e.target.classList.remove('flex');
-            }
-          });
-        </script>
+  <!-- Modal target -->
+  <div id="modal" class="fixed inset-0 hidden items-center justify-center bg-black/40">
+    <div id="modal-body" class="bg-white rounded-2xl shadow-xl w-full max-w-2xl"></div>
+  </div>
+  <script>
+    document.body.addEventListener('htmx:afterSwap', (e) => {
+      if (e.detail.target.id === 'modal-body') {
+        const m = document.getElementById('modal');
+        m.classList.remove('hidden'); m.classList.add('flex');
+      }
+    });
+    document.addEventListener('click', (e) => {
+      if (e.target.id === 'modal') {
+        e.target.classList.add('hidden'); e.target.classList.remove('flex');
+      }
+    });
+  </script>
 </body>
-
 </html>

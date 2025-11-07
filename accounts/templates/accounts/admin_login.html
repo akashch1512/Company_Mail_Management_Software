@@ -1,25 +1,52 @@
 {% extends "core/base.html" %}
 {% block content %}
 
-
-<div class="flex items-center justify-between mb-6">
-  <h1 class="text-2xl font-semibold mb-6">Admin Login</h1>
-  <a href="{% url 'auth_portal' %}" class="text-sm text-slate-600 underline">Employee Login</a>
+<!-- Top bar with Employee Login button -->
+<div class="flex items-center justify-end mb-6">
+  <a href="{% url 'auth_portal' %}"
+     class="inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+    <span>Employee Login</span>
+    ➜
+  </a>
 </div>
 
+<!-- Centered login card -->
+<div class="min-h-[70vh] flex items-center justify-center">
+  <div class="w-full max-w-md">
+    <div class="text-center mb-6">
+      <h1 class="text-3xl font-semibold tracking-tight">Admin Login</h1>
+      <p class="mt-2 text-sm text-slate-600">Sign in to access your dashboard</p>
+    </div>
 
+    <div class="bg-white rounded-2xl shadow-lg p-6">
+      <form method="post" action="{% url 'admin_login' %}" class="space-y-4">
+        {% csrf_token %}
 
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">Username</label>
+          <input name="username" autocomplete="username"
+                 class="w-full rounded-xl border px-3 py-2 outline-none focus:ring-2 focus:ring-slate-300"
+                 required />
+        </div>
 
-<div class="bg-white rounded-2xl shadow p-6 max-w-md">
-  <form method="post" action="{% url 'admin_login' %}">
-    {% csrf_token %}
-    <label class="block text-sm mb-2">Username</label>
-    <input name="username" class="border rounded w-full p-2 mb-4" required />
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+          <input type="password" name="password" autocomplete="current-password"
+                 class="w-full rounded-xl border px-3 py-2 outline-none focus:ring-2 focus:ring-slate-300"
+                 required />
+        </div>
 
-    <label class="block text-sm mb-2">Password</label>
-    <input type="password" name="password" class="border rounded w-full p-2 mb-6" required />
+        <button
+          class="w-full rounded-xl bg-slate-900 px-4 py-2.5 text-white font-medium hover:opacity-95">
+          Sign in
+        </button>
+      </form>
+    </div>
 
-    <button class="w-full bg-slate-900 text-white rounded px-4 py-2">Sign in</button>
-  </form>
+    <p class="mt-4 text-center text-xs text-slate-500">
+      Having trouble? Contact your system administrator.
+    </p>
+  </div>
 </div>
+
 {% endblock %}

@@ -20,6 +20,7 @@ urlpatterns = [
     path("code/reveal", core_views.admin_code_reveal, name="admin_code_reveal"),
     path("code/regen", core_views.admin_code_regen, name="admin_code_regen"),
     path("employees/<int:employee_id>/approve", core_views.admin_employee_approve, name="admin_employee_approve"),
+    
 
 ]
 

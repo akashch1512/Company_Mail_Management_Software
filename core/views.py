@@ -10,7 +10,6 @@ from accounts.decorators import admin_required, employee_required
 from .models import Org, Employee
 from django.contrib import messages
 
-
 from .models import Message, SenderMapping, Employee, Client
 from .rules import detect_assignment
 
@@ -74,7 +73,22 @@ def employees(request):
 
 @login_required
 def clients(request):
-    return render(request, "core/clients.html", {"items": Client.objects.all()})
+    if request.method == "POST":
+        code = (request.POST.get("code") or "").strip().upper()
+        name = (request.POST.get("name") or "").strip()
+        if not code or not name:
+            messages.error(request, "Both Code and Name are required.")
+            return redirect("clients")
+        obj, created = Client.objects.get_or_create(code=code, defaults={"name": name})
+        if not created:
+            messages.warning(request, f"Client with code {code} already exists.")
+        else:
+            messages.success(request, f"Client {name} added.")
+        return redirect("clients")
+
+    items = Client.objects.order_by("code")
+    return render(request, "core/clients.html", {"items": items})
+
 
 # DEV: seed demo data quickly
 @login_required
