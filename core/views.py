@@ -209,9 +209,3 @@ def admin_employee_approve(request, employee_id: int):
     emp.save(update_fields=["approved"])
     messages.success(request, f"{emp.display_name} approved.")
     return redirect("dashboard")
-
-
-
-
-
-
